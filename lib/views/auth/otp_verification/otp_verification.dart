@@ -23,7 +23,7 @@ class OtpAuthenticationView extends StatefulWidget {
 class _OtpAuthenticationViewState extends State<OtpAuthenticationView> {
   // AuthController authController = Get.find<AuthController>();
 
-  TextEditingController controller = TextEditingController();
+final  TextEditingController controller = TextEditingController();
   // final selectedTypeController = Get.put(SelectedTypeController());
 
   @override
@@ -96,14 +96,14 @@ class _OtpAuthenticationViewState extends State<OtpAuthenticationView> {
                       text: 'Continue',
                       textColor: AppColors.primary,
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return RoleScreen(); // Replace with your desired screen/widget
-                            },
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) {
+                        //       return RoleScreen(); // Replace with your desired screen/widget
+                        //     },
+                        //   ),
+                        // );
                       },
                       backgroundColor:
                           AppColors.secondary, // Custom background color

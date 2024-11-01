@@ -1,15 +1,22 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:repairoo/controllers/audio_controller.dart';
 import 'package:repairoo/controllers/home_controller.dart';
+import 'package:repairoo/controllers/signup_controller.dart';
 import 'package:repairoo/controllers/user_controller.dart';
+import 'package:repairoo/views/auth/signup_view/role_screen.dart';
+import 'package:repairoo/views/bottom_nav/bottom_nav.dart';
 import 'package:repairoo/views/splash_screen/splash_screen.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // Lock the app in portrait mode
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -17,11 +24,12 @@ void main() async {
   ]);
 
   Get.put(UserController());
+  Get.put(SignupController());
   Get.put(AudioController());
   Get.put(TechHomeController());
   Get.put(HomeController());
 
-  runApp(const MyApp());
+  runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -36,7 +44,7 @@ class MyApp extends StatelessWidget {
           builder: (_, child) {
             return GetMaterialApp(
               debugShowCheckedModeBanner: false,
-              home: SplashScreen(),
+              home: RoleScreen(),
               // initialBinding: UserBinding(),
             );
           }),

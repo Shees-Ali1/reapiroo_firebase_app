@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../const/color.dart';
+import '../../../../const/images.dart';
 import '../../../../const/text_styles.dart';
 import '../../../../controllers/tech_controller.dart';
 import '../../../../widgets/custom_button.dart';
@@ -23,10 +27,60 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
   final TextEditingController lastname = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TechController techController = Get.find();
+  String? _imagePath; // Store the image path
+  void _showImageSourceDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            "Choose an Option",
+            style: jost400(
+              16,
+              AppColors.primary,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery); // Pick image from gallery
+                },
+                child:
+                    Text('Gallery', style: jost400(14.sp, AppColors.primary)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera); // Take photo with camera
+                },
+                child: Text('Camera', style: jost400(14.sp, AppColors.primary)),
+              ),
+            ],
+          ),
+          backgroundColor: AppColors.secondary,
+        );
+      },
+    );
+  }
+
+  /// Function to pick an image
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+        source: source); // Use pickImage instead of getImage
+
+    if (pickedFile != null) {
+      setState(() {
+        _imagePath = pickedFile.path; // Update the image path
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,6 +94,43 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
           SizedBox(height: 56.h),
 
           /// First Name and Last Name TextFields
+          Center(
+            child: GestureDetector(
+              onTap: () => _showImageSourceDialog(context),
+              child: _imagePath != null
+                  ? Container(
+                      width: 106.w,
+                      height: 106.h,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: FileImage(File(_imagePath!)),
+                            fit: BoxFit.cover,
+                          ),
+                          color: Colors.white,
+                          shape: BoxShape.circle),
+                    )
+                  : Container(
+                      width: 106.w,
+                      height: 106.h,
+                      decoration: BoxDecoration(
+                          color: Colors.black, shape: BoxShape.circle),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                              height: 50.h,
+                              width: 50.w,
+                              child: Image.asset(
+                                AppImages.upload_img,
+                                color: AppColors.secondary,
+                              ))
+                        ],
+                      ),
+                    ),
+            ),
+          ),
+          SizedBox(height: 30.h),
+
           Row(
             children: [
               Expanded(
@@ -99,7 +190,6 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
             },
             backgroundColor: AppColors.primary,
           ),
-
         ],
       ),
     );
