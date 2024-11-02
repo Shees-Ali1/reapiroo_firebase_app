@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../../const/color.dart';
 import '../../../../const/images.dart';
 import '../../../../const/text_styles.dart';
@@ -171,6 +172,47 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
             ),
           ),
           SizedBox(height: 25.h),
+          IntlPhoneField(
+            flagsButtonPadding: EdgeInsets.only(left: 13.w),
+            cursorColor: Colors.black,
+            style: TextStyle(color: Colors.black),
+            showDropdownIcon: false,
+            decoration: InputDecoration(
+              hintText: 'Your phone number',
+              filled: true,
+              fillColor: Color(0xffFAFAFA),
+              contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 14.h),
+
+              counterText: '',
+              hintStyle: TextStyle(
+                color: Colors.black,
+                fontFamily: 'jost',
+                fontSize: 14.65.sp,
+                fontWeight: FontWeight.w400,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(13.31.r),
+                borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(13.31.r),
+                borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(13.31.r),
+                borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
+              ),
+            ),
+            initialCountryCode: 'AE',
+            onChanged: (phone) {
+              try {
+                debugPrint("Phone number entered: ${phone.completeNumber}");
+              } catch (e) {
+                debugPrint("Error processing phone number: $e");
+              }
+            },
+          ),
+          SizedBox(height: 25.h),
 
           /// Gender Drop Down Field
           GenderDropdownField(
@@ -179,7 +221,7 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
             iconHeight: 18.h,
             iconWidth: 18.w,
           ),
-          SizedBox(height: 120.h),
+          SizedBox(height: 100.h),
 
           CustomElevatedButton(
             text: 'Next',
@@ -190,6 +232,8 @@ class _PersonalDetailsFormState extends State<PersonalDetailsForm> {
             },
             backgroundColor: AppColors.primary,
           ),
+          SizedBox(height: 25.h),
+
         ],
       ),
     );

@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:repairoo/controllers/signup_controller.dart';
 import 'package:repairoo/views/bottom_nav/bottom_nav.dart';
 
 import '../../../const/color.dart';
@@ -21,10 +24,19 @@ class CustomerSignup extends StatefulWidget {
 }
 
 class _CustomerSignupState extends State<CustomerSignup> {
-  final TextEditingController firstname = TextEditingController();
-  final TextEditingController email = TextEditingController();
-  String? selectedGender;
-  String? _imagePath; // Store the image path
+
+  final SignupController signupController = Get.find<SignupController>();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    signupController.phonenumber.clear();
+    signupController.email.clear();
+    signupController.name.clear();
+    signupController.selectedGender.value ='';
+    // signupController.imageFile?.clear();
+  }
+
   void _showImageSourceDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -32,30 +44,30 @@ class _CustomerSignupState extends State<CustomerSignup> {
         return AlertDialog(
           title: Text(
             "Choose an Option",
-            style: jost400(
-              16,
-              AppColors.primary,
-            ),
+            style: jost400(16, AppColors.primary),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.gallery); // Pick image from gallery
-                },
-                child:
-                    Text('Gallery', style: jost400(14.sp, AppColors.primary)),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.camera); // Take photo with camera
-                },
-                child: Text('Camera', style: jost400(14.sp, AppColors.primary)),
-              ),
-            ],
+          content: SizedBox(
+            // Wrap content in a SizedBox to limit height and improve layout
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    signupController.pickImage(ImageSource.gallery); // Pick image from gallery
+                  },
+                  child: Text('Gallery', style: jost400(14.sp, AppColors.primary)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    signupController.pickImage(ImageSource.camera); // Take photo with camera
+                  },
+                  child: Text('Camera', style: jost400(14.sp, AppColors.primary)),
+                ),
+              ],
+            ),
           ),
           backgroundColor: AppColors.secondary,
         );
@@ -63,21 +75,9 @@ class _CustomerSignupState extends State<CustomerSignup> {
     );
   }
 
-  /// Function to pick an image
-  Future<void> _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(
-        source: source); // Use pickImage instead of getImage
-
-    if (pickedFile != null) {
-      setState(() {
-        _imagePath = pickedFile.path; // Update the image path
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    print(signupController.userRole.value);
     return GestureDetector(
       onTap: () {
         FocusScope.of(context)
@@ -88,6 +88,7 @@ class _CustomerSignupState extends State<CustomerSignup> {
         body: SingleChildScrollView(
           child: Column(
             children: [
+
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -95,7 +96,6 @@ class _CustomerSignupState extends State<CustomerSignup> {
                         image: AssetImage(AppImages.onboardingelipse2),
                         fit: BoxFit.fill)),
                 child: Column(
-
                   children: [
                     SizedBox(
                       height: 100.h,
@@ -116,34 +116,37 @@ class _CustomerSignupState extends State<CustomerSignup> {
                     SizedBox(height: 30.h),
                     GestureDetector(
                       onTap: () => _showImageSourceDialog(context),
-                      child: _imagePath != null
-                          ? Container(
-                              width: 106.w,
-                              height: 106.h,
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: FileImage(File(_imagePath!)),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  color: Colors.white,
-                                  shape: BoxShape.circle),
+                      child: Container(
+                          width: 106.w,
+                          height: 106.h,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            image: signupController.imageFile != null
+                                ? DecorationImage(
+                              image: FileImage(signupController.imageFile!), // Use the imageFile if it's not null
+                              fit: BoxFit.cover,
                             )
-                          : Container(
-                              width: 106.w,
-                              height: 106.h,
-                              decoration: BoxDecoration(
-                                  color: Colors.white, shape: BoxShape.circle),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                      height: 50.h,
-                                      width: 50.w,
-                                      child: Image.asset(AppImages.upload_img,color: AppColors.primary,))
-                                ],
+                                : null,
+                          ),
+                          child: signupController.imageFile == null // Show upload icon if no image is selected
+                              ? Center(
+                            child: SizedBox(
+                              height: 50.h,
+                              width: 50.w,
+                              child: Image.asset(
+                                AppImages.upload_img,
+                                color: AppColors.primary,
                               ),
                             ),
+                          )
+                              : null, // No child if image is present
+                        )
+
                     ),
+
+
+
                     SizedBox(height: 30.h),
                   ],
                 ),
@@ -153,7 +156,7 @@ class _CustomerSignupState extends State<CustomerSignup> {
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: CustomInputField(
                   label: 'Full name',
-                  controller: firstname,
+                  controller: signupController.name,
                   prefixIcon: Icon(
                     Icons.person,
                     color: AppColors.primary,
@@ -166,12 +169,58 @@ class _CustomerSignupState extends State<CustomerSignup> {
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: CustomInputField(
                   label: 'Your email',
-                  controller: email,
+                  controller: signupController.email,
                   prefixIcon: Icon(
                     Icons.email_rounded,
                     color: AppColors.primary,
                     size: 18.sp,
                   ), // Add prefix icon here
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: IntlPhoneField(
+
+                  controller: signupController.phonenumber,
+                  flagsButtonPadding: EdgeInsets.only(left: 13.w),
+                  cursorColor: Colors.black,
+                  style: TextStyle(color: Colors.black),
+                  showDropdownIcon: false,
+                  decoration: InputDecoration(
+
+                    hintText: 'Your phone number',
+                    filled: true,
+                    fillColor: Color(0xffFAFAFA),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 14.h),
+                    counterText: '',
+                    hintStyle: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'jost',
+                      fontSize: 14.65.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(13.31.r),
+                      borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(13.31.r),
+                      borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(13.31.r),
+                      borderSide: BorderSide(color: Color(0xffE2E2E2),width: 0.95),
+                    ),
+                  ),
+                  initialCountryCode: 'AE',
+                  onChanged: (phone) {
+                    try {
+                      debugPrint("Phone number entered: ${phone.completeNumber}");
+                    } catch (e) {
+                      debugPrint("Error processing phone number: $e");
+                    }
+                  },
                 ),
               ),
               SizedBox(height: 16.h),
@@ -194,16 +243,7 @@ class _CustomerSignupState extends State<CustomerSignup> {
                   // borderSide: BorderSide(color: Color(0xffBDD0EA),width: 1),
                   text: 'Continue',
                   textColor: AppColors.secondary,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return AppNavBar(); // Replace with your desired screen/widget
-                        },
-                      ),
-                    );
-                  },
+                  onPressed: signupController.signup,
                   backgroundColor: AppColors.primary, // Custom background color
                 ),
               ),

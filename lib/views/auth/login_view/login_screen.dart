@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:repairoo/const/text_styles.dart';
+import 'package:repairoo/controllers/signup_controller.dart';
 import 'package:repairoo/views/auth/otp_verification/otp_verification.dart';
 import 'package:repairoo/views/auth/signup_view/role_screen.dart';
 
@@ -17,6 +21,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final SignupController signupController = Get.find<SignupController>();
+
   // FocusNode _phoneFocusNode = FocusNode();
   // @override
   // void dispose() {
@@ -24,9 +30,27 @@ class _LoginScreenState extends State<LoginScreen> {
   //       .dispose(); // Dispose of the focus node when the widget is disposed
   //   super.dispose();
   // }
+  @override
+  void initState() {
+    print('called');
+    // TODO: implement initState
+    super.initState();
+    Fetchuser();
+  }
+void Fetchuser ()async{
+    try{
+      DocumentSnapshot usersnap = await FirebaseFirestore.instance.collection('userDetails').doc(FirebaseAuth.instance.currentUser!.uid).get();
+      var userData =usersnap.data() as Map<String,dynamic>;
+      String phonenumber = userData['phoneNumber'];
+      print('phone number${phonenumber}');
+    }catch(e){
+      print('error$e');
+    }
 
+}
   @override
   Widget build(BuildContext context) {
+    Fetchuser();
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -95,6 +119,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   onChanged: (phone) {
                     try {
                       debugPrint("Phone number entered: ${phone.completeNumber}");
+                      signupController.phonenumber.text= phone.completeNumber;
+                      debugPrint("Phone number text: ${signupController.phonenumber.text}");
                     } catch (e) {
                       debugPrint("Error processing phone number: $e");
                     }
@@ -110,17 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: CustomElevatedButton(
                   text: 'Login',
                   textColor: AppColors.primary,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return OtpAuthenticationView(); // Replace with your desired screen/widget
-                        },
-                      ),
-                    );
-
-                    // Button action
+                  onPressed:(){
+                    signupController.sendOTP(signupController.phonenumber.text);
                   },
 
                   backgroundColor:

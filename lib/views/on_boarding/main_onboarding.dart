@@ -31,14 +31,7 @@ class _MainOnBoardingViewState extends State<MainOnBoardingView> {
       );
     } else if (currentpage == 4) {
       // Navigate to the LoginView screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return LoginScreen(); // Replace with your desired screen/widget
-          },
-        ),
-      );
+      Get.offAll(LoginScreen());
     }
   }
 
@@ -93,14 +86,7 @@ class _MainOnBoardingViewState extends State<MainOnBoardingView> {
                   // Arrow button with circular progress
                   GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return LoginScreen(); // Replace with your desired screen/widget
-                            },
-                          ),
-                        );
+                        Get.offAll(LoginScreen());
                       },
                       child: Text('Skip',style: jost500(18.sp, AppColors.secondary),)),
                   GestureDetector(

@@ -8,6 +8,7 @@ import 'package:repairoo/const/svg_icons.dart';
 import 'package:repairoo/const/text_styles.dart';
 import 'package:repairoo/controllers/home_controller.dart';
 import 'package:repairoo/controllers/nav_bar_controller.dart';
+import 'package:repairoo/controllers/user_controller.dart';
 import 'package:repairoo/views/customer_wallet_screen/wallet_screen.dart';
 import 'package:repairoo/views/home_screen_for_tech/components/announcement_containers.dart';
 import 'package:repairoo/views/home_screens_for_customers/components/services_container.dart';
@@ -29,6 +30,7 @@ class _CustomerMainHomeState extends State<CustomerMainHome> {
 
   final HomeController customerVM = Get.find<HomeController>();
   final NavBarController navBarController = Get.find<NavBarController>();
+  final UserController userController = Get.find<UserController>();
 
 
   List<Map<String, dynamic>> dummy = [
@@ -55,6 +57,13 @@ class _CustomerMainHomeState extends State<CustomerMainHome> {
     "announcement",
     "offer"
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    userController.fetchUserData();
+
+  }
 
   @override
   Widget build(BuildContext context) {
